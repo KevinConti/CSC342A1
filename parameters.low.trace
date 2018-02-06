@@ -1,0 +1,6 @@
+100		// Number of events 
+100		// Key Range 
+500		// Data Range 
+1		// Trace switch (1=on)
+n		// Interactive (y=on)
+762516		// Random Number Generator seed
