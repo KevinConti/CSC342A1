@@ -38,11 +38,11 @@ void enQueue(Queue *self, data_t *data)
 	}
 	else {
 		QueueNode *newNode = (QueueNode *) calloc(1, sizeof(QueueNode));
-		newNode->next = self->head;
-		newNode->prev = NULL;
+		newNode->next = NULL;
+		newNode->prev = self->head;
 		newNode->data = data;
-		self->head->prev = newNode;
-		self->head = newNode;
+		self->head->next = newNode;
+		self->tail = newNode;
 	}
 }
 
