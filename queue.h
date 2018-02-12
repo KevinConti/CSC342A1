@@ -44,4 +44,4 @@ data_t *findValue(Queue *self, data_t *data);
 void purge(Queue *self, data_t *data);
 void printQ(Queue *self, char *label);
 char *toString(data_t *d);
-
+void printNode(QueueNode *self);
