@@ -73,12 +73,44 @@ data_t *deQueue(Queue *self)
 
 void removeNode(Queue *self, QueueNode *p)
 {
+    //If both head and tail are null, then the node is not in the queue
+    if(self->head == NULL && self->tail == NULL) return;
+    //If p->prev is NULL, then this is the head
+    if(p->prev == NULL){
+        self->head = self->head->next;
+        p->next->prev = p->prev;
+    }
+    //if p->next is NULL, then this is the tail
+    else if(p->next == NULL){
+        self->tail = self->tail->prev;
+        p->prev->next = p->next;
+    }
+    else{
+        //Do standard removal
+        printf("Break four\n");
+        p->prev->next = p->next;
+        printf("Break five\n");
+        p->next->prev = p->prev;
+        printf("Break six\n");
+     }    
+     free(p);
+    
 }
 
 
 
 QueueNode *findNode(Queue *self, data_t *data)
 {
+    QueueNode *currentNode = self->head;
+    do{
+        if (currentNode->data->key == data->key) break;
+        currentNode = currentNode->next;
+        if(currentNode->next == NULL){
+            currentNode = NULL;
+            break;
+        }
+    } while (currentNode->next != NULL);
+    return currentNode;
 }
 
 
@@ -126,7 +158,7 @@ char *toString(data_t *d)
 int main ()
 {
     Queue myQueue;
-    QueueNode *p;
+    QueueNode *p, *node1, *node2, *node3, *head;
     data_t data[10], d2;
     int i;
 
@@ -145,6 +177,37 @@ int main ()
     deQueue(&myQueue);
     printf("New frontNode: ");
     printNode(frontNode(&myQueue));
+
+    //Test removeNode Method
+    d2.key = 1;
+    node1 = findNode(&myQueue, &d2);
+    d2.key = 2;
+    node2 = findNode(&myQueue, &d2);
+    d2.key = 3;
+    node3 = findNode(&myQueue, &d2);
+    removeNode(&myQueue, node2);
+    //node1.next should point to node 3
+    printf("Node 1 -> next = ");
+    printNode(node1->next);
+    //node3.prev should point to node 1
+    printf("Node 3 -> prev = ");
+    printNode(node3->prev);
+    //When a head node is removed, the head is properly moved
+    printf("Old head: ");
+    head = myQueue.head;
+    printNode(head);
+    removeNode(&myQueue, node1); 
+    printf("New head: ");
+    head = myQueue.head;
+    printNode(head);
+
+    
+    //Test findNode method
+    d2.key = 3;
+    d2.value = 50;
+    QueueNode *foundNode = findNode(&myQueue, &d2);
+    printf("foundNode: ");
+    printNode(foundNode);
 }
 
 
