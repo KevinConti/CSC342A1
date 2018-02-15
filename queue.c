@@ -21,13 +21,16 @@
 
 void initQueue(Queue *self)
 {
-	self->head = NULL;
-	self->tail = NULL;
+    printf("running initQueue\n");
+    self->head = NULL;
+    self->tail = NULL;
+    printf("InitQueue is completed\n");
 }
 
 
 void enQueue(Queue *self, data_t *data)
 {
+    printf("Running enQueue\n");
 	if(self == NULL) return;
 	if(self->head == NULL){
 		//Should run only when an empty queue exists
@@ -44,30 +47,46 @@ void enQueue(Queue *self, data_t *data)
 		self->tail->next = newNode;
 		self->tail = newNode;
 	}
+    printf("Enqueue complete\n");
 }
 
 
 QueueNode *frontNode(Queue *self)
 {
-    return self->head;
+    if(self->head != NULL){
+        return self->head;
+    } else {
+    return NULL;
+    }
 }
 
 
 data_t *frontValue(Queue *self)
 {
-    return self->head->data;
+    if(self->head != NULL){
+        return self->head->data;
+    } else {
+        return NULL;
+    }
 }
 
 
 data_t *deQueue(Queue *self)
 {
     data_t *data = frontValue(self);
-    printf("self->head->next is:");
-    printNode(self->head->next);
-    self->head = self->head->next;
-    free(self->head->prev);
-    self->head->prev = NULL;
-    return data;
+    if(self->head != NULL){
+        if(self->head->next != NULL){
+            self->head = self->head->next;
+            free(self->head->prev);
+            self->head->prev = NULL;
+        } else if(self->tail != NULL){
+            //self->head->next is null, therefore we are dequeing the final node
+            free(self->head);
+            self->head = NULL;
+            self->tail = NULL; //TODO: This may cause an error, or maybe it's exactly right. Who knows
+        }
+    }
+   return data;
 }
 
 
@@ -75,8 +94,13 @@ void removeNode(Queue *self, QueueNode *p)
 {
     //If both head and tail are null, then the node is not in the queue
     if(self->head == NULL && self->tail == NULL) return;
+    //If p->prev and p->next are null, then this is the only object in the queue
+    if(p->prev == NULL && p->next == NULL){
+        self->head = NULL;
+        self->tail = NULL;
+    }
     //If p->prev is NULL, then this is the head
-    if(p->prev == NULL){
+    else if(p->prev == NULL){
         self->head = self->head->next;
         p->next->prev = p->prev;
     }
@@ -101,21 +125,33 @@ void removeNode(Queue *self, QueueNode *p)
 
 QueueNode *findNode(Queue *self, data_t *data)
 {
-    QueueNode *currentNode = self->head;
-    do{
-        if (currentNode->data->key == data->key) break;
-        currentNode = currentNode->next;
-        if(currentNode->next == NULL){
+    QueueNode *currentNode;
+
+    if(self->head!= NULL){
+        currentNode = self->head;
+        do{
+            if (currentNode->data->key == data->key) break;
+            if(currentNode->next == NULL){
+                currentNode = NULL;
+                break;
+                }
+            currentNode = currentNode->next;
+        } while (currentNode->next != NULL);
+        //Repeat block one more time in order to check the last value
+        if(currentNode->data->key != data->key){
             currentNode = NULL;
-            break;
         }
-    } while (currentNode->next != NULL);
+    } else currentNode = NULL;
     return currentNode;
 }
 
 
 data_t *findValue(Queue *self, data_t *data)
 {
+    QueueNode *foundNode = findNode(self, data);
+    if(foundNode != NULL){
+        return foundNode->data;
+    } else return NULL;
 }
 
 
@@ -126,13 +162,23 @@ void purge(Queue *self, data_t *data)
 
 void printQ(Queue *self, char *label)
 {
-    if (self == NULL){
-        puts("NULL");
+    printf("Kevin Conti's  :");
+    if (self->head  == NULL && self->tail == NULL){
+        puts("Empty but initialized Queue");
     } else {
+        QueueNode *currentNode = self->head;
+        printf("%s  ", toString(currentNode->data));
+        while(currentNode->next != NULL){
+            currentNode = currentNode->next;
+            printf("%s   ", toString(currentNode->data));
+        }
+    /*
+        printf("Break1\n");
         printf("Queue head: %s\n", toString(self->head->data));
+        printf("Break2\n");
         printf("Queue tail: %s\n", toString(self->tail->data));
+    */
     }
-    
 }
 
 void printNode(QueueNode *self){
@@ -154,7 +200,7 @@ char *toString(data_t *d)
 }
 
 
-
+/*
 int main ()
 {
     Queue myQueue;
@@ -208,7 +254,13 @@ int main ()
     QueueNode *foundNode = findNode(&myQueue, &d2);
     printf("foundNode: ");
     printNode(foundNode);
-}
 
+    //Test findValue method
+    d2.key = 3;
+    d2.value = 50;
+    data_t *foundValue = findValue(&myQueue, &d2); 
+    printf("foundData: %s\n", toString(foundValue));
+}
+*/
 
 
